@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Data sets</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container">
+        <form>
+            <div class="row justify-content-between bg-light">
+                <div class="col-auto">
+                    <h5 class="text-secondary">Fake CSV</h5>
+                </div>
+                <div class="col-auto">
+                    <label class="text-secondary">Data Schemas</label>
+                </div>
+                <div class="col-auto">
+                    <label class="text-secondary">Hello, {{ user.username }}!</label>
+                    <a href="{% url 'logout' %}" class="text-secondary">
+                        Logout
+                        {% csrf_token %}
+                    </a>
+                </div>
+            </div>
+            <br><div class="row">
+                <div class="col">
+                    <h3>{{main_rows.0.Title}}</h3>
+                </div>
+                <div class="col">
+                    <a href="{% url 'edit' main_rows.0.id %}" >Edit scheme</a>
+                </div>
+            </div>
+            <table class="table mt-3">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Column name</th>
+                        <th>Column type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for data in schema_rows %}
+                    <tr id="{{schema_rows.id}}">
+                        <th>{{forloop.counter}}</th>
+                        <td>{{data.Name}}</td>
+                        <td>{{data.Type}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="d-flex align-items-center">
+              <h3>Data sets</h3>
+              <div class="form-group ml-auto form-inline">
+                    <label>Rows:</label>
+                    <input id="rows" type="text" name="rows" class="form-control" style="width: 100px;">
+                    <button id="gen-btn" class="btn btn-success">Generate Data</button>
+              </div>
+            </div>
+        </form>
+        <table id="dataset-table" class="table mt-3">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Created</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in datasets %}
+                <tr>
+                    <th>{{forloop.counter}}</th>
+                    <td>{{data.Date|date:"Y-m-d"}}</td>
+                    <td><label class="bg-success text-white border rounded p-1">Ready</label></td>
+                    <td><a href="{% url 'download_csv' dataset_id=data.id %}" download >Download</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script>
+    $('#gen-btn').click(function(event) {
+        event.preventDefault();
+        var rowsInput = document.getElementsByName("rows")[0];
+        if (!rowsInput.value) {
+            alert("Please enter a value for rows.");
+            return;
+        }
+        var full_val = {
+            num_gen: rowsInput.value,
+            main_id: "{{main_rows.0.id}}"
+        };
+        var genbi = $('#gen-btn');
+        genbi.prop('disabled', true);
+
+        var newRow = $('<tr></tr>');
+        var newCell1 = $('<th></th>').text($('#dataset-table tr').length);
+        var now = new Date();
+        var newCell2 = $('<td></td>').text(now.getFullYear() + '-' + ('0' + (now.getMonth() + 1)).slice(-2) + '-' + ('0' + now.getDate()).slice(-2));
+        var newCell3 = $('<td></td>').html('<label class="bg-secondary text-white border rounded p-1">Processing</label>');
+
+
+        newRow.append(newCell1);
+        newRow.append(newCell2);
+        newRow.append(newCell3);
+
+        $('#dataset-table').append(newRow);
+
+        $.ajax({
+            url: '/generate/',
+            method: 'POST',
+            data: {
+                'values': JSON.stringify(full_val)
+            },
+            beforeSend: function(xhr, settings) {
+                xhr.setRequestHeader('X-CSRFToken', $('input[name="csrfmiddlewaretoken"]').val());
+            },
+            dataType: 'json',
+            success: function(response) {
+                var newRow = $('#dataset-table tr:last');
+                genbi.prop('disabled', false);
+                newRow.find('td:nth-child(3)').html('<label class="bg-success text-white border rounded p-1">Ready</label>');
+                var newCell4 = $('<td></td>').html('<a href="/download_csv/' + response.dataset_id + '/" download>Download</a>');
+                newRow.append(newCell4);
+            },
+            error: function(xhr, errmsg, err) {
+                alert('Error!');
+            }
+        });
+    });
+
+    </script>
+</body>
+</html>
