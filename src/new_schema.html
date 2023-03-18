@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>New Schema</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+            integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"
+            integrity="sha384-mQ93GR66B00ZXjt0YO5KlohRA5SY2XofN4zfuZxLkoj1gXtW8ANNCe9d5Y3eG5eD"
+            crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <style>
+        .form-group {
+          display: inline-block;
+          vertical-align: center;
+          margin-right: 10px;
+
+        }
+        .form-group select {
+          -webkit-appearance: none;
+          -moz-appearance: none;
+          appearance: none;
+          background-color: transparent;
+          background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 12 12\'><path d=\'M2.29 4.71a1 1 0 011.41 0L6 7.59l2.29-2.3a1 1 0 011.41 1.41l-2.71 2.7a1 1 0 01-1.41 0L2.29 6.12a1 1 0 010-1.41z\' fill=\'%23333\' /></svg>');
+          background-repeat: no-repeat;
+          background-position: right .75rem center;
+          background-size: 12px;
+          padding-right: 32px;
+        }
+        .form-group select::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          right: 0;
+          width: 32px;
+          height: 100%;
+          background: url('data:image/svg+xml;charset=UTF-8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 8 8\'><path d=\'M0 2l4 4 4-4z\' /></svg>') no-repeat center;
+          pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row justify-content-between bg-light">
+        <div class="col-auto">
+            <h5 class="text-secondary">Fake CSV</h5>
+        </div>
+        <div class="col-auto">
+            <label class="text-secondary">Data Schemas</label>
+        </div>
+        <div class="col-auto">
+            <label class="text-secondary">Hello, {{ user.username }}!</label>
+            <a href="{% url 'logout' %}" class="text-secondary">
+                Logout
+                {% csrf_token %}
+            </a>
+        </div>
+    </div>
+    <br>
+    <div class="row justify-content-between">
+        <div class="col-auto">
+            <h4>New Schema</h4>
+        </div>
+        <div class="col-auto" style="position: relative; left: -230px;">
+            <button id="submit-btn" class="btn btn-primary">Submit</button>
+        </div>
+    </div>
+
+    <form id="schema-info" method="POST" class="form-group1">
+        {% csrf_token %}
+        <div class="form-group1">
+            <label for="name-input">Name</label>
+            <input type="text" name="name" class="form-control" id="name-input" style="width: 300px;">
+        </div>
+        <div class="form-group">
+            <label for="sep-select">Column separator</label>
+            <select class="form-control type" name="sep" id="sep-select" style="width: 300px;">
+                <option value=",">Comma(,)</option>
+                <option value=";">Semicolon(;)</option>
+            </select>
+        </div><br>
+        <div class="form-group">
+            <label for="stch-select">String Character</label>
+            <select class="form-control type" name="stch" id="stch-select" style="width: 300px;">
+                <option value="'">Quote(')</option>
+                <option value='"'>Double-quote(")</option>
+            </select>
+        </div>
+    </form>
+    <br>
+    <h4><b>Schema Columns</b></h4>
+    <br>
+
+    <div id="forms-container">
+        <form id="main-form" method="POST" class="dynamic-form form-group">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="form-group">
+                <label for="col-name-input">Column name</label>
+                <input type="text" name="col_name" class="form-control" id="col-name-input" style="width:300px">
+            </div>
+            <div class="form-group">
+                <label for="type-select">Type</label>
+                <select id="select-main" class="form-control type" name="type" style="width: 200px">
+                    <option value="Name">Name</option>
+                    <option value="Job">Job</option>
+                    <option value="Email">Email</option>
+                    <option value="Integer">Integer</option>
+                    <option value="Address">Address</option>
+                    <option value="Phone">Phone</option>
+                </select>
+            </div>
+            <div class="form-group" style="width: 100px;">
+                <label for="order-input">Order</label>
+                <input type="text" name="order" class="form-control" id="order-input">
+            </div>
+            <div class="form-group">
+                <a href="#" class="delete-form-btn text-danger">Delete</a><br>
+            </div>
+        </form>
+        <br><br><button id="add-form-btn" class="btn btn-primary">Add column</button>
+    </div>
+    <script id="form-template" class="dynamic-form" type="text/template">
+        <form method="POST" class="form-group">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="form-group">
+                <label for="col-name-input">Column name</label>
+                <input type="text" name="col_name" class="form-control" id="col-name-input" style="width:300px">
+            </div>
+            <div class="form-group">
+                <label for="type-select">Type</label>
+                <select class="form-control type" name="type" onchange="handleChange(event)" style="width: 200px">
+                    <option value="Name">Name</option>
+                    <option value="Job">Job</option>
+                    <option value="Email">Email</option>
+                    <option value="Integer">Integer</option>
+                    <option value="Address">Address</option>
+                    <option value="Phone">Phone</option>
+                </select>
+            </div>
+            <div class="form-group" style="width: 100px;">
+                <label for="order-input">Order</label>
+                <input type="text" name="order" class="form-control" id="order-input">
+            </div>
+            <div class="form-group">
+                <a href="#" class="delete-form-btn text-danger">Delete</a><br>
+            </div>
+            <br><br>
+        </form>
+    </script>
+</div>
+
+<script type="text/javascript">
+
+        document.querySelectorAll(".type").forEach(select => {
+          select.addEventListener("change", handleChange);
+        });
+
+
+        var maxForms = 6;
+        var form_template = $('#form-template').html();
+
+        $(document).on('click', '.delete-form-btn', function() {
+          let counter = $('#forms-container').find('form').length - 1;
+          var form = $(this).closest('form');
+          form.remove();
+          if ($('#add-form-btn').is(':hidden'))  {
+            $('#add-form-btn').show();
+          }
+        });
+
+        $('#add-form-btn').click(function() {
+
+          let formCount = $('#forms-container').find('form').length + 1;
+
+          const myButton = document.getElementById("add-form-btn");
+          const myForm = document.getElementById("form-template");
+          myForm.insertAdjacentElement("afterend", myButton);
+
+          if (formCount <= maxForms) {
+
+            var new_form = form_template.replace(/__prefix__/g, formCount);
+            $('#forms-container').append(new_form);
+
+            if (formCount >= maxForms) {
+                $('#add-form-btn').hide();
+            }
+          }
+        });
+
+        $('#submit-btn').click(function(e) {
+          e.preventDefault();
+
+
+          var selects = $('select[name="type"]');
+          var values = [];
+          selects.each(function() {
+            var val = $(this).val();
+            values.push(val);
+          });
+
+          if (hasDuplicates(values)) {
+            alert('You cannot choose the same types for different columns!');
+          } else {
+
+                const formsContainer = document.getElementById("forms-container");
+                const formses = formsContainer.querySelectorAll("form");
+
+                // Перевіряємо, чи всі поля заповнені
+                var isFormValid = true;
+                $('#schema-info input, #schema-info select').each(function() {
+                  if ($.trim($(this).val()) == '') {
+                    isFormValid = false;
+                    return false;
+                  }
+                });
+
+                formses.forEach((form) => {
+                  const inputs = form.querySelectorAll("input, select");
+
+                  inputs.forEach((input) => {
+                    if (!input.value) {
+                      isFormValid = false;
+                    }
+                  });
+                });
+
+                // Якщо яке-небудь поле порожнє, викликаємо вікно з попередженням
+                if (!isFormValid) {
+                  alert('Please fill in all fields');
+                } else {
+                    const orders = {};
+
+                    const formsContainer = document.getElementById("forms-container");
+                    const inputOrders = formsContainer.querySelectorAll('input[name="order"]');
+
+                    let allValid = true;
+
+                    inputOrders.forEach(inputOrder => {
+                      const orderValue = inputOrder.value.trim();
+
+                      // Check if input value is an integer
+                      if (!Number.isInteger(+orderValue)) {
+                        allValid = false;
+                        return;
+                      }
+
+                      // Check if input value is unique
+                      if (orders[orderValue]) {
+                        orders[orderValue]++;
+                        allValid = false;
+                      } else {
+                        orders[orderValue] = 1;
+                      }
+                    });
+
+                    if (!allValid) {
+                      alert("There are invalid or non-unique input values.");
+                    } else {
+
+                        var checkForIntInput = checkIntFields()
+                        if (checkForIntInput !== false){
+                            const input1Value = $('#forms-container input[name="input1"]').val();
+                            const input2Value = $('#forms-container input[name="input2"]').val();
+
+                            if (Number(input2Value) <= Number(input1Value)) {
+                                alert('Value in field "To" must be bigger than in "From"');
+
+                            } else {
+
+                                var full_val = {};
+                                var forms = document.querySelectorAll("#forms-container form");
+
+                                var sep = document.querySelector("#schema-info select[name='sep']").value;
+                                var stch = document.querySelector("#schema-info select[name='stch']").value;
+                                var name = document.querySelector("#schema-info input[name='name']").value;
+
+                                full_val = {
+                                    name: name,
+                                    sep: sep,
+                                    stch: stch,
+                                };
+
+                                forms.forEach(function(form) {
+                                    var col_name = form.querySelector("input[name='col_name']").value;
+                                    var type = form.querySelector("select[name='type']").value;
+                                    var order = form.querySelector("input[name='order']").value;
+
+                                    if (type==='Integer'){
+                                        var input1 = form.querySelector("input[name='input1']").value;
+                                        var input2 = form.querySelector("input[name='input2']").value;
+
+                                        full_val[type] = {
+                                          input1: input1,
+                                          input2: input2,
+                                          col_name: col_name,
+                                          order: order
+                                        };
+                                    } else{
+
+                                        full_val[type] = {
+                                          col_name: col_name,
+                                          order: order
+                                        };
+                                    }
+                                });
+                                $.ajax({
+                                    url: '/getting/',
+                                    method: 'POST',
+                                    data: {
+                                        'values': JSON.stringify(full_val)
+                                    },
+                                    beforeSend: function(xhr, settings) {
+                                        xhr.setRequestHeader('X-CSRFToken', $('input[name="csrfmiddlewaretoken"]').val());
+                                    },
+                                    dataType: 'json',
+                                    success: function(response) {
+                                        window.location.replace('/');
+                                    },
+                                    error: function(xhr, errmsg, err) {
+                                        alert('Error!');
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }
+          }
+        });
+
+        function hasDuplicates(array) {
+          return (new Set(array)).size !== array.length;
+        }
+        function handleChange(event) {
+          const select = event.target;
+          const selectedValue = select.options[select.selectedIndex].value;
+
+          if (selectedValue === "Integer") {
+            // create two input elements
+            const input1 = document.createElement("input");
+            input1.setAttribute("type", "text");
+            input1.setAttribute("name", "input1");
+            input1.setAttribute("placeholder", "From");
+            input1.setAttribute("class", "int_field");
+            input1.setAttribute("style", "width:70px");
+
+
+
+
+            const input2 = document.createElement("input");
+            input2.setAttribute("type", "text");
+            input2.setAttribute("name", "input2");
+            input2.setAttribute("placeholder", "To");
+            input2.setAttribute("class", "int_field");
+            input2.setAttribute("style", "width:70px");
+
+
+            // insert the input elements after the select element
+            select.parentNode.insertAdjacentElement("afterend", input2);
+            select.parentNode.insertAdjacentElement("afterend", input1);
+
+          } else {
+            // if the selected value is not "Integer", remove the next two inputs if they exist
+            const nextElement = select.parentNode.nextSibling;
+            if (nextElement instanceof HTMLInputElement) {
+              nextElement.parentNode.removeChild(nextElement);
+            }
+            const secondNextElement = select.parentNode.nextSibling;
+            if (secondNextElement instanceof HTMLInputElement) {
+              secondNextElement.parentNode.removeChild(secondNextElement);
+            }
+          }
+        }
+
+        function checkIntFields() {
+          var int_fields = document.getElementsByClassName("int_field");
+          var isInteger = Array.prototype.every.call(int_fields, function(field) {
+            return Number.isInteger(Number(field.value));
+          });
+          if (!isInteger) {
+            alert("Please enter integer values in all From-To fields.");
+            return false;
+          }
+        }
+
+</script>
+</body>
+</html>
