@@ -2,7 +2,6 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-csv_gen/settings.py
 
 db.sqlite3
 *.sqlite3
