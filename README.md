@@ -4,3 +4,5 @@ Django-app for creating data schemas, with various properties and options. On th
              'planeks': 'kinder76',
              'user': 'karabas123'
             }
+<br /><br />
+http://nillovych.pythonanywhere.com/
