@@ -46,35 +46,21 @@
                 </thead>
                 <tbody>
                 {% for data in main_data %}
-                <tr id="{{data.id}}">
-                    <th>{{ forloop.counter }}</th>
-                    <td> <a href="{% url 'datasets' data.id %}">{{data.Title}}</a> </td>
-                    <td>{{data.Date|date:"Y-m-d"}}</td>
-                    <td>
-                        <a href="{% url 'edit' data.id %}">Edit scheme</a>
-                        <a href="#" class="text-danger" onclick="deleteRow({{data.id}})">Delete</a>
-                    </td>
-                </tr>
+                    <tr id="{{ data.id }}">
+                        <th>{{ forloop.counter }}</th>
+                        <td><a href="{% url 'datasets' data.id %}">{{ data.Title }}</a></td>
+                        <td>{{ data.Date|date:"Y-m-d" }}</td>
+                        <td>
+                            <a href="{% url 'edit' data.id %}">Edit scheme</a>
+                            <a href="#" class="text-danger" onclick="deleteRow({{ data.id }})">Delete</a>
+                        </td>
+                    </tr>
                 {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
 </div>
-<script>
-    function deleteRow(id) {
-        $.ajax({
-          url: "/delete_row/",
-          type: "POST",
-          data: {row_id: id},
-          beforeSend: function(xhr, settings) {
-            xhr.setRequestHeader('X-CSRFToken', $('input[name="csrfmiddlewaretoken"]').val());
-          },
-          success: function() {
-            $("#" + id).remove();
-          }
-        });
-    }
-</script>
+<script src="{% static 'js/home.js' %}"></script>
 </body>
 </html>

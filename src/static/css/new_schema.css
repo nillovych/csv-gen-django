@@ -1,0 +1,29 @@
+.form-group {
+    display: inline-block;
+    vertical-align: center;
+    margin-right: 10px;
+
+}
+
+.form-group select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: transparent;
+    background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 12 12\'><path d=\'M2.29 4.71a1 1 0 011.41 0L6 7.59l2.29-2.3a1 1 0 011.41 1.41l-2.71 2.7a1 1 0 01-1.41 0L2.29 6.12a1 1 0 010-1.41z\' fill=\'%23333\' /></svg>');
+    background-repeat: no-repeat;
+    background-position: right .75rem center;
+    background-size: 12px;
+    padding-right: 32px;
+}
+
+.form-group select::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 32px;
+    height: 100%;
+    background: url('data:image/svg+xml;charset=UTF-8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 8 8\'><path d=\'M0 2l4 4 4-4z\' /></svg>') no-repeat center;
+    pointer-events: none;
+}
